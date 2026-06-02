@@ -1,6 +1,10 @@
 <div id="app-screen">
   <div class="topbar">
     <span class="topbar-logo">◆ Financiamento</span>
+    <nav class="topbar-nav">
+      <a routerLink="/dashboard" class="nav-link nav-link--active">Financiamento</a>
+      <a routerLink="/despesas" class="nav-link">Despesas & Receitas</a>
+    </nav>
     <div class="topbar-right">
       <span class="user-email" id="user-email">{{ auth.currentUser()?.email }}</span>
       <button class="btn-logout" (click)="logout()">Sair</button>

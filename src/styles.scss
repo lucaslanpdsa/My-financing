@@ -35,6 +35,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);font-size:14
 .user-email{font-size:12px;color:var(--muted);font-family:var(--mono);}
 .btn-logout{font-family:var(--sans);font-size:12px;font-weight:500;border:1px solid var(--border2);background:transparent;color:var(--muted);border-radius:7px;padding:5px 12px;cursor:pointer;}
 .btn-logout:hover{border-color:var(--red);color:var(--red);}
+.topbar-nav{display:flex;gap:4px;}
+.nav-link{font-family:var(--sans);font-size:13px;font-weight:500;padding:5px 12px;border-radius:7px;text-decoration:none;color:var(--muted);transition:all .15s;}
+.nav-link:hover{color:var(--text);}
+.nav-link--active{color:var(--accent);background:var(--accent-light);}
 .app{padding:20px 24px;max-width:1100px;margin:0 auto;}
 
 /* ── CONFIG BAR ── */

@@ -1,0 +1,28 @@
+<div id="despesas-screen">
+  <div class="topbar">
+    <span class="topbar-logo">◆ Financiamento</span>
+    <nav class="topbar-nav">
+      <a routerLink="/dashboard" class="nav-link">Financiamento</a>
+      <a routerLink="/despesas" class="nav-link nav-link--active">Despesas & Receitas</a>
+    </nav>
+    <div class="topbar-right">
+      <span class="user-email">{{ auth.currentUser()?.email }}</span>
+    </div>
+  </div>
+
+  <div class="app">
+    @if (isLoading()) {
+      <div class="loading"><span class="dot-anim">Carregando</span></div>
+    } @else {
+      <div class="budget-grid">
+        <app-budget-column tipo="receita" />
+        <app-budget-column tipo="despesa" />
+      </div>
+
+      <div class="saldo-bar" [class.saldo-bar--negativo]="budget.saldo() < 0">
+        <span class="saldo-label">Saldo restante</span>
+        <span class="saldo-valor">{{ budget.saldo() | fmtCurrency }}</span>
+      </div>
+    }
+  </div>
+</div>

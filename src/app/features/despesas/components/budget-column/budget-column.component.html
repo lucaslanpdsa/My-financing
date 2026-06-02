@@ -1,0 +1,35 @@
+<div class="budget-col">
+  <div class="col-header">
+    <span class="col-title" [style.color]="accentColor">{{ title }}</span>
+    <span class="col-total" [style.color]="accentColor">{{ total | fmtCurrency }}</span>
+  </div>
+
+  <div class="col-list">
+    @for (item of items; track item.id) {
+      <div class="budget-item">
+        <span class="item-nome">{{ item.nome }}</span>
+        <span class="item-valor">{{ item.valor | fmtCurrency }}</span>
+        <button class="item-remove" (click)="remove(item.id)" aria-label="remover">×</button>
+      </div>
+    }
+
+    @if (items.length === 0 && !isAdding()) {
+      <div class="empty-msg">Nenhum item ainda.</div>
+    }
+  </div>
+
+  @if (isAdding()) {
+    <div class="add-form">
+      <input type="text" [(ngModel)]="newNome" placeholder="Nome" class="add-input" autofocus/>
+      <input type="number" [(ngModel)]="newValor" placeholder="Valor" class="add-input add-input--val" min="0.01" step="0.01"/>
+      <div class="add-actions">
+        <button class="btn-confirm" [disabled]="isSaving()" (click)="add()">
+          {{ isSaving() ? '...' : 'Adicionar' }}
+        </button>
+        <button class="btn-cancel" (click)="cancelAdd()">Cancelar</button>
+      </div>
+    </div>
+  } @else {
+    <button class="btn-add" (click)="isAdding.set(true)">+ Adicionar</button>
+  }
+</div>

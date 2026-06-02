@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { FinancingService } from '../../core/financing.service';
 import { ChartsComponent } from './components/charts/charts.component';
@@ -12,6 +13,7 @@ import { ProgressBarComponent } from './components/progress-bar/progress-bar.com
   selector: 'app-dashboard',
   standalone: true,
   imports: [
+    RouterLink,
     ConfigBarComponent,
     JurosBoxComponent,
     KpisComponent,
