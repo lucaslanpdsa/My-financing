@@ -27,6 +27,11 @@ export class FinancingService {
   readonly totalDiscount = computed(() =>
     this.paidInstallments().reduce((s, i) => s + Math.max(0, i.value - i.paidValue), 0)
   );
+  readonly paidInterest = computed(() => {
+    const { financedAmount, totalInstallments } = this.config();
+    const principalPerInstallment = totalInstallments > 0 ? financedAmount / totalInstallments : 0;
+    return Math.max(0, this.totalPaid() - principalPerInstallment * this.paidInstallments().length);
+  });
 
   initInstallments(total: number, value: number): void {
     this.installments.set(

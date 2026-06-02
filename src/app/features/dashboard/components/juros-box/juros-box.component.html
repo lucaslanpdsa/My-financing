@@ -13,6 +13,11 @@
     <div class="ji-s">{{ effectiveCost().toFixed(1) }}% sobre o capital</div>
   </div>
   <div class="ji">
+    <div class="ji-l">Juros já pagos</div>
+    <div class="ji-v r">{{ financing.paidInterest() | fmtCurrency }}</div>
+    <div class="ji-s">{{ paidInterestPercent().toFixed(1) }}% dos juros totais</div>
+  </div>
+  <div class="ji">
     <div class="ji-l">Taxa mensal est.</div>
     <div class="ji-v r">{{ monthlyRate().toFixed(2) }}% a.m.</div>
     <div class="ji-s">{{ annualRate().toFixed(1) }}% a.a.</div>

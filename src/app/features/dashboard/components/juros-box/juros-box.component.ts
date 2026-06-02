@@ -28,4 +28,10 @@ export class JurosBoxComponent {
   readonly annualRate = computed(() =>
     (Math.pow(1 + this.monthlyRate() / 100, 12) - 1) * 100
   );
+
+  readonly paidInterestPercent = computed(() => {
+    const total = this.financing.totalInterest();
+    const paid = this.financing.paidInterest();
+    return total > 0 ? (paid / total) * 100 : 0;
+  });
 }
