@@ -26,14 +26,6 @@ export class ConfigBarComponent implements OnInit {
     this.cfgFinanced.set(cfg.financedAmount);
   }
 
-  autoFillFinanced(): void {
-    const total = this.cfgTotal();
-    const value = this.cfgValue();
-    if (total > 0 && value > 0) {
-      this.cfgFinanced.set(parseFloat((total * value).toFixed(2)));
-    }
-  }
-
   get saveLabel(): string {
     switch (this.financing.saveStatus()) {
       case 'saving': return 'Salvando...';

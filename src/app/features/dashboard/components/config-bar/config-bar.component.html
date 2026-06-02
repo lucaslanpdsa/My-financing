@@ -2,11 +2,11 @@
   <div class="cfg-sep">Configuração do financiamento</div>
   <div class="cfg-f">
     <label>Nº de parcelas</label>
-    <input type="number" id="cfg-total" [ngModel]="cfgTotal()" (ngModelChange)="cfgTotal.set($event); autoFillFinanced()" min="1" max="600"/>
+    <input type="number" id="cfg-total" [ngModel]="cfgTotal()" (ngModelChange)="cfgTotal.set($event)" min="1" max="600"/>
   </div>
   <div class="cfg-f">
     <label>Valor da parcela (R$)</label>
-    <input type="number" id="cfg-valor" [ngModel]="cfgValue()" (ngModelChange)="cfgValue.set($event); autoFillFinanced()" min="0.01" step="0.01"/>
+    <input type="number" id="cfg-valor" [ngModel]="cfgValue()" (ngModelChange)="cfgValue.set($event)" min="0.01" step="0.01"/>
   </div>
   <div class="cfg-f">
     <label>Valor financiado (R$)</label>
