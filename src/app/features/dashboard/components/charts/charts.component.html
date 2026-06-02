@@ -1,0 +1,29 @@
+<div class="charts-grid">
+  <div class="chart-card">
+    <div class="chart-t">Valor pago por data</div>
+    <div style="position:relative;width:100%;height:180px;">
+      <canvas #chartByDate id="chart-data" role="img" aria-label="Total pago por data">Total por data.</canvas>
+    </div>
+    <div class="chart-leg">
+      <span><span class="leg-b" style="background:#2d6a4f"></span>Total pago na data</span>
+    </div>
+  </div>
+  <div class="chart-card">
+    <div class="chart-t">Valor pago por mês</div>
+    <div style="position:relative;width:100%;height:180px;">
+      <canvas #chartByMonth id="chart-mes" role="img" aria-label="Total pago por mês">Total por mês.</canvas>
+    </div>
+    <div class="chart-leg">
+      <span><span class="leg-b" style="background:#1a3d2e"></span>Total no mês</span>
+    </div>
+    @if (monthCount() > 0) {
+      <div id="chart-mes-stats" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:10px;">
+        <div class="mes-stat" style="border-color:var(--accent);max-width:180px">
+          <div class="mes-stat-l">Média / mês</div>
+          <div class="mes-stat-v" style="color:var(--accent)">{{ monthAvg() | fmtCurrency }}</div>
+          <div class="mes-stat-s">{{ monthCount() }} meses</div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

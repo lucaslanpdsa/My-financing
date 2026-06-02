@@ -1,0 +1,11 @@
+<div class="prog-wrap">
+  <div class="prog-header">
+    <span class="prog-title">Progresso geral</span>
+    <span class="prog-pct" id="prog-pct">
+      {{ financing.percentPaid() }}% ({{ financing.paidInstallments().length }}/{{ financing.installments().length }})
+    </span>
+  </div>
+  <div class="prog-track">
+    <div class="prog-fill" id="prog-fill" [style.width.%]="financing.percentPaid()"></div>
+  </div>
+</div>

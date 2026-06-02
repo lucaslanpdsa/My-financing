@@ -91,6 +91,10 @@
     .chart-leg{display:flex;gap:12px;margin-top:10px;font-size:10px;color:var(--muted);}
     .chart-leg span{display:flex;align-items:center;gap:4px;}
     .leg-b{width:10px;height:10px;border-radius:2px;}
+    .mes-stat{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 11px;display:flex;flex-direction:column;gap:2px;flex:1;min-width:120px;}
+    .mes-stat-l{font-size:9px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+    .mes-stat-v{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--text);}
+    .mes-stat-s{font-size:10px;color:var(--muted);}
 
     .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;}
     .table-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
@@ -106,6 +110,9 @@
     .pg{background:var(--accent-light);color:#1a4731;}
     .pa{background:var(--warn-light);color:var(--warn);}
     .val-input{font-family:var(--mono);font-size:12px;border:1px solid var(--border2);border-radius:6px;padding:4px 7px;background:var(--bg);color:var(--text);width:100px;outline:none;}
+    .date-input{font-family:var(--mono);font-size:12px;border:1px solid var(--border2);border-radius:6px;padding:4px 7px;background:var(--bg);color:var(--text);outline:none;}
+    .date-input:focus{border-color:var(--accent);background:#fff;}
+    .date-input:disabled{opacity:.35;cursor:not-allowed;}
     .val-input:focus{border-color:var(--accent);background:#fff;}
     .val-input:disabled{opacity:.35;cursor:not-allowed;}
     .toggle-btn{width:32px;height:18px;border-radius:9px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0;}
@@ -166,9 +173,9 @@
     <div id="app-content" style="display:none">
       <div class="config-bar">
         <div class="cfg-sep">Configuração do financiamento</div>
-        <div class="cfg-f"><label>Nº de parcelas</label><input type="number" id="cfg-total" value="36" min="1" max="600"/></div>
-        <div class="cfg-f"><label>Valor da parcela (R$)</label><input type="number" id="cfg-valor" value="795.18" min="0.01" step="0.01"/></div>
-        <div class="cfg-f"><label>Valor financiado (R$)</label><input type="number" id="cfg-fin" value="20000" min="0.01" step="0.01"/></div>
+        <div class="cfg-f"><label>Nº de parcelas</label><input type="number" id="cfg-total" min="1" max="600" oninput="autoFillFin()"/></div>
+        <div class="cfg-f"><label>Valor da parcela (R$)</label><input type="number" id="cfg-valor" min="0.01" step="0.01" oninput="autoFillFin()"/></div>
+        <div class="cfg-f"><label>Valor financiado (R$)</label><input type="number" id="cfg-fin" min="0.01" step="0.01"/></div>
         <button class="btn-ap" onclick="applyConfig()">Aplicar</button>
         <span class="saving-badge" id="saving-badge"></span>
       </div>
@@ -188,6 +195,7 @@
           <div class="chart-t">Valor pago por mês</div>
           <div style="position:relative;width:100%;height:180px;"><canvas id="chart-mes" role="img" aria-label="Total pago por mês">Total por mês.</canvas></div>
           <div class="chart-leg"><span><span class="leg-b" style="background:#1a3d2e"></span>Total no mês</span></div>
+          <div id="chart-mes-stats" style="margin-top:10px;display:flex;flex-wrap:wrap;gap:10px;"></div>
         </div>
       </div>
       <div class="table-wrap">
@@ -202,6 +210,7 @@
             <th style="text-align:right">Valor</th>
             <th style="text-align:right">Valor pago</th>
             <th style="text-align:right">Desconto</th>
+            <th style="text-align:center">Data pagamento</th>
             <th style="text-align:center;width:65px">Paga?</th>
           </tr></thead>
           <tbody id="tbody"></tbody>
@@ -213,10 +222,8 @@
 </div>
 
 <script>
-// ── CONFIG: substitua pelos seus valores do Supabase ──
 const SUPABASE_URL = 'https://msnuowrqchxydywyrily.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zbnVvd3JxY2h4eWR5d3lyaWx5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAzNzgwODIsImV4cCI6MjA5NTk1NDA4Mn0.wL67XrOZcMBHWJMzyIp-1hMIMB6BWu_vg-UfH6rGXis';
-// ─────────────────────────────────────────────────────
 
 const { createClient } = supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -226,6 +233,7 @@ let parcelas = [];
 let config = { total: 36, valor: 795.18, financiado: 20000 };
 let chartData = null, chartMes = null;
 let saveTimer = null;
+let dataLoaded = false;
 
 // ── AUTH ────────────────────────────────────────────
 function switchTab(tab) {
@@ -275,22 +283,45 @@ async function doForgot() {
 }
 
 async function doLogout() {
-  await sb.auth.signOut();
+  try { await sb.auth.signOut(); } catch (e) { console.warn('signOut:', e); }
+  currentUser = null;
+  dataLoaded = false;
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app-screen').style.display = 'none';
 }
 
 // ── SESSION ─────────────────────────────────────────
+
+function showApp(user) {
+  currentUser = user;
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  document.getElementById('user-email').textContent = user.email;
+}
+
+function showAuth() {
+  currentUser = null;
+  dataLoaded = false;
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app-screen').style.display = 'none';
+}
+
+// Usa onAuthStateChange para todos os eventos — é o único jeito confiável
+// de saber quando o token foi restaurado do localStorage no reload
 sb.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') return;
+
   if (session?.user) {
-    currentUser = session.user;
-    document.getElementById('auth-screen').style.display = 'none';
-    document.getElementById('app-screen').style.display = '';
-    document.getElementById('user-email').textContent = currentUser.email;
-    await loadUserData();
-  } else {
-    currentUser = null;
-    document.getElementById('auth-screen').style.display = 'flex';
-    document.getElementById('app-screen').style.display = 'none';
+    const isNewLogin = !dataLoaded || currentUser?.id !== session.user.id;
+    showApp(session.user);
+    if (isNewLogin) {
+      dataLoaded = true;
+      await loadUserData();
+    }
+  } else if (event === 'SIGNED_OUT') {
+    showAuth();
   }
+  // INITIAL_SESSION sem user = ainda carregando, não faz nada
 });
 
 // ── DATA ─────────────────────────────────────────────
@@ -298,50 +329,53 @@ async function loadUserData() {
   document.getElementById('app-loading').style.display = 'flex';
   document.getElementById('app-content').style.display = 'none';
 
-  // Carregar config
-  const { data: cfgData } = await sb.from('financiamento_config')
-    .select('*').eq('user_id', currentUser.id).single();
+  try {
+    const [cfgResult, pResult] = await Promise.all([
+      sb.from('financiamento_config').select('*').eq('user_id', currentUser.id).maybeSingle(),
+      sb.from('parcelas').select('*').eq('user_id', currentUser.id).order('numero')
+    ]);
 
-  if (cfgData) {
-    config = { total: cfgData.total_parcelas, valor: cfgData.valor_parcela, financiado: cfgData.valor_financiado };
-    document.getElementById('cfg-total').value = config.total;
-    document.getElementById('cfg-valor').value = config.valor;
-    document.getElementById('cfg-fin').value = config.financiado;
+    const cfgData = cfgResult.data;
+    const pData = pResult.data;
+
+    if (cfgData) {
+      config = { total: cfgData.total_parcelas, valor: cfgData.valor_parcela, financiado: cfgData.valor_financiado };
+      document.getElementById('cfg-total').value = config.total;
+      document.getElementById('cfg-valor').value = config.valor;
+      document.getElementById('cfg-fin').value = config.financiado;
+    }
+
+    if (pData && pData.length > 0) {
+      parcelas = pData.map(p => ({
+        num: p.numero, total: config.total, valor: config.valor,
+        paga: p.paga, valorPago: p.valor_pago, dataPag: p.data_pagamento
+      }));
+    } else if (!cfgData) {
+      initParcelas(config.total, config.valor);
+    }
+  } catch (e) {
+    console.error('Erro ao carregar dados:', e.message);
+    if (parcelas.length === 0) initParcelas(config.total, config.valor);
+  } finally {
+    document.getElementById('app-loading').style.display = 'none';
+    document.getElementById('app-content').style.display = 'block';
+    renderAll();
   }
-
-  // Carregar parcelas
-  const { data: pData } = await sb.from('parcelas')
-    .select('*').eq('user_id', currentUser.id).order('numero');
-
-  if (pData && pData.length > 0) {
-    parcelas = pData.map(p => ({
-      num: p.numero, total: config.total, valor: config.valor,
-      paga: p.paga, valorPago: p.valor_pago, dataPag: p.data_pagamento
-    }));
-  } else {
-    initParcelas(config.total, config.valor);
-    await saveAllParcelas();
-  }
-
-  if (!cfgData) await saveConfig();
-
-  document.getElementById('app-loading').style.display = 'none';
-  document.getElementById('app-content').style.display = '';
-  renderAll();
 }
 
 async function saveConfig() {
-  await sb.from('financiamento_config').upsert({
+  const { error } = await sb.from('financiamento_config').upsert({
     user_id: currentUser.id,
     total_parcelas: config.total,
     valor_parcela: config.valor,
     valor_financiado: config.financiado,
     updated_at: new Date().toISOString()
   }, { onConflict: 'user_id' });
+  if (error) throw error;
 }
 
 async function saveParcela(p) {
-  await sb.from('parcelas').upsert({
+  const { error } = await sb.from('parcelas').upsert({
     user_id: currentUser.id,
     numero: p.num,
     paga: p.paga,
@@ -349,6 +383,7 @@ async function saveParcela(p) {
     data_pagamento: p.dataPag,
     updated_at: new Date().toISOString()
   }, { onConflict: 'user_id,numero' });
+  if (error) throw error;
 }
 
 async function saveAllParcelas() {
@@ -360,17 +395,20 @@ async function saveAllParcelas() {
     data_pagamento: p.dataPag,
     updated_at: new Date().toISOString()
   }));
-  await sb.from('parcelas').upsert(rows, { onConflict: 'user_id,numero' });
+  const { error } = await sb.from('parcelas').upsert(rows, { onConflict: 'user_id,numero' });
+  if (error) throw error;
 }
 
 async function deleteParcelas(fromNum) {
-  await sb.from('parcelas').delete()
+  const { error } = await sb.from('parcelas').delete()
     .eq('user_id', currentUser.id).gte('numero', fromNum);
+  if (error) throw error;
 }
 
-function showSaving(text) {
+function showSaving(text, isError) {
   const el = document.getElementById('saving-badge');
   el.textContent = text;
+  el.style.color = isError ? 'var(--red)' : 'var(--muted)';
 }
 
 // ── LOGIC ────────────────────────────────────────────
@@ -432,16 +470,38 @@ function renderCharts() {
     const mk = getMesKey(p.dataPag);
     byMes[mk] = (byMes[mk] || 0) + p.valorPago;
   });
+  const byMesCount = {};
+  parcelas.forEach(p => {
+    if (!p.paga || !p.dataPag) return;
+    const mk = getMesKey(p.dataPag);
+    byMesCount[mk] = (byMesCount[mk] || 0) + 1;
+  });
   const datas = Object.keys(byData).sort(dtSort);
   const dVals = datas.map(d => parseFloat(byData[d].toFixed(2)));
   const mesKeys = Object.keys(byMes).sort();
   const mLabels = mesKeys.map(getMesLabel);
   const mVals = mesKeys.map(k => parseFloat(byMes[k].toFixed(2)));
+  const avg = mesKeys.length ? mVals.reduce((s, v) => s + v, 0) / mesKeys.length : 0;
+
+  const statsEl = document.getElementById('chart-mes-stats');
+  if (mesKeys.length > 0) {
+    statsEl.innerHTML = `
+      <div class="mes-stat" style="border-color:var(--accent);max-width:180px">
+        <div class="mes-stat-l">Média / mês</div>
+        <div class="mes-stat-v" style="color:var(--accent)">${fmt(avg)}</div>
+        <div class="mes-stat-s">${mesKeys.length} meses</div>
+      </div>`;
+  } else {
+    statsEl.innerHTML = '';
+  }
 
   if (chartData) chartData.destroy();
   if (chartMes) chartMes.destroy();
+  chartData = null; chartMes = null;
 
-  const opts = () => ({
+  const mCount = mesKeys.map(k => byMesCount[k] || 0);
+
+  const optsBase = () => ({
     responsive: true, maintainAspectRatio: false,
     plugins: { legend: { display: false } },
     scales: {
@@ -454,25 +514,36 @@ function renderCharts() {
     chartData = new Chart(document.getElementById('chart-data'), {
       type: 'bar',
       data: { labels: datas, datasets: [{ label: 'Total pago na data', data: dVals, backgroundColor: '#2d6a4f', borderRadius: 4 }] },
-      options: opts()
+      options: optsBase()
     });
   }
   if (mesKeys.length > 0) {
     chartMes = new Chart(document.getElementById('chart-mes'), {
       type: 'bar',
       data: { labels: mLabels, datasets: [{ label: 'Total no mês', data: mVals, backgroundColor: '#1a3d2e', borderRadius: 4 }] },
-      options: opts()
+      options: {
+        ...optsBase(),
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              afterLabel: ctx => `${mCount[ctx.dataIndex]} parcela${mCount[ctx.dataIndex] !== 1 ? 's' : ''}`
+            }
+          }
+        }
+      }
     });
   }
 }
 
 function renderTable() {
-  const tbody = document.getElementById('tbody');
-  tbody.innerHTML = '';
-  parcelas.forEach((p, idx) => {
+  // Constrói HTML completo antes de atribuir — evita O(N²) do innerHTML +=
+  const rows = parcelas.map((p, idx) => {
     const disc = p.paga ? p.valor - p.valorPago : 0;
     const discStr = p.paga && disc > 0.005 ? '- ' + fmt(disc) : '—';
-    tbody.innerHTML += `<tr>
+    // Converte dd/mm/yyyy → yyyy-mm-dd para o input[type=date]
+    const dateVal = p.dataPag ? p.dataPag.split('/').reverse().join('-') : '';
+    return `<tr>
       <td><div class="ti"><span class="nm">${p.num}/${p.total}</span></div></td>
       <td><div class="ti">${p.paga ? '<span class="pill pg">Paga</span>' : '<span class="pill pa">Em aberto</span>'}</div></td>
       <td><div class="ti tr"><span class="nm">${fmt(p.valor)}</span></div></td>
@@ -481,9 +552,12 @@ function renderTable() {
         : `<input class="val-input" type="number" value="${p.valor.toFixed(2)}" disabled/>`
       }</div></td>
       <td><div class="ti tr"><span class="${p.paga && disc > 0.005 ? 'dp' : 'dn'}">${discStr}</span></div></td>
+      <td><div class="ti tc"><input class="date-input" type="date" value="${dateVal}" ${p.paga ? `onchange="updateData(${idx},this.value)"` : 'disabled'}/></div></td>
       <td><div class="ti tc"><button class="toggle-btn ${p.paga ? 'on' : 'off'}" onclick="togglePaga(${idx})" aria-label="toggle paga"></button></div></td>
     </tr>`;
   });
+  document.getElementById('tbody').innerHTML = rows.join('');
+
   const pagas = parcelas.filter(p => p.paga);
   const totalPago = pagas.reduce((s, p) => s + p.valorPago, 0);
   const totalDisc = pagas.reduce((s, p) => s + Math.max(0, p.valor - p.valorPago), 0);
@@ -492,6 +566,7 @@ function renderTable() {
     <td><div class="ti tr"><span class="nm">${fmt(parcelas.reduce((s, p) => s + p.valor, 0))}</span></div></td>
     <td><div class="ti tr"><span class="nm" style="color:var(--accent)">${fmt(totalPago)}</span></div></td>
     <td><div class="ti tr"><span class="dp">${fmt(totalDisc)}</span></div></td>
+    <td></td>
     <td></td>
   </tr>`;
 }
@@ -509,8 +584,13 @@ async function togglePaga(idx) {
   }
   renderAll();
   showSaving('Salvando...');
-  await saveParcela(parcelas[idx]);
-  showSaving('✓ Salvo');
+  try {
+    await saveParcela(parcelas[idx]);
+    showSaving('✓ Salvo');
+  } catch (e) {
+    console.error('saveParcela:', e);
+    showSaving('Erro ao salvar', true);
+  }
   setTimeout(() => showSaving(''), 2000);
 }
 
@@ -518,15 +598,39 @@ async function updateVal(idx, val) {
   const v = parseFloat(val);
   if (!isNaN(v) && v >= 0) {
     parcelas[idx].valorPago = v;
-    renderAll();
+    // Atualiza só o necessário — não recria os gráficos a cada digitação
+    renderJuros(); renderKpis(); renderTable();
     clearTimeout(saveTimer);
     showSaving('Salvando...');
     saveTimer = setTimeout(async () => {
-      await saveParcela(parcelas[idx]);
-      showSaving('✓ Salvo');
+      try {
+        await saveParcela(parcelas[idx]);
+        showSaving('✓ Salvo');
+        renderCharts();
+      } catch (e) {
+        console.error('saveParcela:', e);
+        showSaving('Erro ao salvar', true);
+      }
       setTimeout(() => showSaving(''), 2000);
     }, 800);
   }
+}
+
+async function updateData(idx, val) {
+  if (!val) return;
+  // Converte yyyy-mm-dd → dd/mm/yyyy
+  const [y, m, d] = val.split('-');
+  parcelas[idx].dataPag = `${d}/${m}/${y}`;
+  renderCharts(); renderKpis();
+  showSaving('Salvando...');
+  try {
+    await saveParcela(parcelas[idx]);
+    showSaving('✓ Salvo');
+  } catch (e) {
+    console.error('saveParcela:', e);
+    showSaving('Erro ao salvar', true);
+  }
+  setTimeout(() => showSaving(''), 2000);
 }
 
 async function applyConfig() {
@@ -548,9 +652,14 @@ async function applyConfig() {
 
   renderAll();
   showSaving('Salvando...');
-  if (newTotal < oldTotal) await deleteParcelas(newTotal + 1);
-  await Promise.all([saveConfig(), saveAllParcelas()]);
-  showSaving('✓ Salvo');
+  try {
+    if (newTotal < oldTotal) await deleteParcelas(newTotal + 1);
+    await Promise.all([saveConfig(), saveAllParcelas()]);
+    showSaving('✓ Salvo');
+  } catch (e) {
+    console.error('applyConfig save:', e);
+    showSaving('Erro ao salvar', true);
+  }
   setTimeout(() => showSaving(''), 2000);
 }
 </script>

@@ -1,0 +1,25 @@
+<div id="app-screen">
+  <div class="topbar">
+    <span class="topbar-logo">◆ Financiamento</span>
+    <div class="topbar-right">
+      <span class="user-email" id="user-email">{{ auth.currentUser()?.email }}</span>
+      <button class="btn-logout" (click)="logout()">Sair</button>
+    </div>
+  </div>
+  <div class="app">
+    @if (isLoading()) {
+      <div id="app-loading" class="loading">
+        <span class="dot-anim">Carregando seus dados</span>
+      </div>
+    } @else {
+      <div id="app-content">
+        <app-config-bar />
+        <app-juros-box />
+        <app-kpis />
+        <app-progress-bar />
+        <app-charts />
+        <app-parcelas-table />
+      </div>
+    }
+  </div>
+</div>

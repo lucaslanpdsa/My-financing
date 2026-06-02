@@ -1,0 +1,88 @@
+<div class="table-wrap">
+  <div class="table-hdr">
+    <span class="table-t">Parcelas</span>
+    <span class="nm" id="tbl-count" style="font-size:11px;color:var(--muted)">
+      {{ financing.installments().length }} parcelas
+    </span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:60px">Parcela</th>
+        <th>Status</th>
+        <th style="text-align:right">Valor</th>
+        <th style="text-align:right">Valor pago</th>
+        <th style="text-align:right">Desconto</th>
+        <th style="text-align:center">Data pagamento</th>
+        <th style="text-align:center;width:65px">Paga?</th>
+      </tr>
+    </thead>
+    <tbody id="tbody">
+      @for (inst of financing.installments(); track trackByNum($index, inst); let idx = $index) {
+        <tr>
+          <td><div class="ti"><span class="nm">{{ inst.num }}/{{ inst.total }}</span></div></td>
+          <td>
+            <div class="ti">
+              @if (inst.paid) {
+                <span class="pill pg">Paga</span>
+              } @else {
+                <span class="pill pa">Em aberto</span>
+              }
+            </div>
+          </td>
+          <td><div class="ti tr"><span class="nm">{{ inst.value | fmtCurrency }}</span></div></td>
+          <td>
+            <div class="ti tr">
+              @if (inst.paid) {
+                <input class="val-input" type="number"
+                  [value]="inst.paidValue.toFixed(2)"
+                  min="0" step="0.01"
+                  (change)="updateValue(idx, $any($event.target).value)"/>
+              } @else {
+                <input class="val-input" type="number" [value]="inst.value.toFixed(2)" disabled/>
+              }
+            </div>
+          </td>
+          <td>
+            <div class="ti tr">
+              @if (inst.paid && (inst.value - inst.paidValue) > 0.005) {
+                <span class="dp">- {{ (inst.value - inst.paidValue) | fmtCurrency }}</span>
+              } @else {
+                <span class="dn">—</span>
+              }
+            </div>
+          </td>
+          <td>
+            <div class="ti tc">
+              <input class="date-input" type="date"
+                [value]="dateToInputValue(inst.paidDate)"
+                [disabled]="!inst.paid"
+                (change)="updateDate(idx, $any($event.target).value)"/>
+            </div>
+          </td>
+          <td>
+            <div class="ti tc">
+              <button class="toggle-btn"
+                [class.on]="inst.paid"
+                [class.off]="!inst.paid"
+                (click)="togglePaid(idx)"
+                aria-label="toggle paga"></button>
+            </div>
+          </td>
+        </tr>
+      }
+    </tbody>
+    <tfoot id="tfoot">
+      <tr class="sum-row">
+        <td colspan="2">
+          <div class="ti" style="color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-size:10px">Total</div>
+        </td>
+        <td><div class="ti tr"><span class="nm">{{ totalValue() | fmtCurrency }}</span></div></td>
+        <td><div class="ti tr"><span class="nm" style="color:var(--accent)">{{ financing.totalPaid() | fmtCurrency }}</span></div></td>
+        <td><div class="ti tr"><span class="dp">{{ financing.totalDiscount() | fmtCurrency }}</span></div></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>

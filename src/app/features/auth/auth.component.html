@@ -1,0 +1,59 @@
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">◆ Financiamento</div>
+    <h1 class="auth-title">Bem-vindo</h1>
+    <p class="auth-sub">Acompanhe todas as parcelas do seu financiamento.</p>
+
+    <div class="auth-tabs">
+      <button class="auth-tab" [class.active]="activeTab() === 'login'" (click)="switchTab('login')">Entrar</button>
+      <button class="auth-tab" [class.active]="activeTab() === 'register'" (click)="switchTab('register')">Criar conta</button>
+    </div>
+
+    @if (activeTab() === 'login') {
+      <div id="login-form">
+        <div class="field">
+          <label>E-mail</label>
+          <input type="email" id="login-email" [(ngModel)]="loginEmail" placeholder="seu@email.com"/>
+        </div>
+        <div class="field">
+          <label>Senha</label>
+          <input type="password" id="login-pass" [(ngModel)]="loginPassword" placeholder="••••••••"/>
+        </div>
+        <button class="btn-primary" [disabled]="isLoading()" (click)="onLogin()">
+          {{ isLoading() ? 'Entrando...' : 'Entrar' }}
+        </button>
+        <button
+          style="width:100%;margin-top:8px;font-family:var(--sans);font-size:12px;background:transparent;border:none;color:var(--muted);cursor:pointer;padding:6px;"
+          (click)="onForgotPassword()">
+          Esqueci minha senha
+        </button>
+      </div>
+    }
+
+    @if (activeTab() === 'register') {
+      <div id="register-form">
+        <div class="field">
+          <label>Nome</label>
+          <input type="text" id="reg-name" [(ngModel)]="registerName" placeholder="Seu nome"/>
+        </div>
+        <div class="field">
+          <label>E-mail</label>
+          <input type="email" id="reg-email" [(ngModel)]="registerEmail" placeholder="seu@email.com"/>
+        </div>
+        <div class="field">
+          <label>Senha</label>
+          <input type="password" id="reg-pass" [(ngModel)]="registerPassword" placeholder="mínimo 6 caracteres"/>
+        </div>
+        <button class="btn-primary" [disabled]="isLoading()" (click)="onRegister()">
+          {{ isLoading() ? 'Criando...' : 'Criar conta' }}
+        </button>
+      </div>
+    }
+
+    @if (msgText()) {
+      <div class="auth-msg" id="auth-msg" [class.error]="msgType() === 'error'" [class.success]="msgType() === 'success'">
+        {{ msgText() }}
+      </div>
+    }
+  </div>
+</div>
