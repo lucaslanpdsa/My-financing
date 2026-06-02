@@ -17,13 +17,13 @@ import { AuthService } from '../../../core/auth.service';
       </nav>
       <div class="topbar-right">
         <span class="user-email" id="user-email">{{ auth.currentUser()?.email }}</span>
-        <button class="btn-logout" (click)="logout()">Sair</button>
+        <button type="button" class="btn-logout" (click)="logout()">Sair</button>
       </div>
     </div>
   `,
 })
 export class TopbarComponent {
-  readonly auth = inject(AuthService);
+  protected readonly auth = inject(AuthService);
 
   async logout(): Promise<void> {
     await this.auth.logout();

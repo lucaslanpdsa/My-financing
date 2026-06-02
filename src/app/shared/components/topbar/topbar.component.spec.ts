@@ -14,6 +14,10 @@ describe('TopbarComponent', () => {
   let component: TopbarComponent;
   let fixture: ComponentFixture<TopbarComponent>;
 
+  beforeEach(() => {
+    mockAuth.logout.mockClear();
+  });
+
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [TopbarComponent],
