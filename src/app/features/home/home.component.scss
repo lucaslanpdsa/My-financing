@@ -1,0 +1,83 @@
+// src/app/features/home/home.component.scss
+.home-content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 24px;
+}
+
+.home-header {
+  margin-bottom: 36px;
+}
+
+.home-greeting {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 6px;
+  font-family: var(--sans);
+}
+
+.home-sub {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.home-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 600px) {
+  .home-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feature-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  text-decoration: none;
+  color: var(--text);
+  transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+  cursor: pointer;
+}
+
+.feature-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.07);
+  transform: translateY(-2px);
+  border-color: var(--border2);
+}
+
+.feature-card-icon {
+  font-family: var(--mono);
+  font-size: 14px;
+  color: var(--accent);
+}
+
+.feature-card-title {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--text);
+  font-family: var(--sans);
+}
+
+.feature-card-desc {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  flex: 1;
+}
+
+.feature-card-cta {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+  font-family: var(--mono);
+  margin-top: 4px;
+}

@@ -1,0 +1,33 @@
+<!-- src/app/features/home/home.component.html -->
+<div id="home-screen">
+  <app-topbar />
+
+  <div class="home-content">
+    <div class="home-header">
+      <p class="home-greeting">Olá, {{ auth.currentUser()?.email }}</p>
+      <p class="home-sub">Escolha uma área para acessar.</p>
+    </div>
+
+    <div class="home-cards">
+      <a routerLink="/financiamento" class="feature-card">
+        <span class="feature-card-icon">◆</span>
+        <h2 class="feature-card-title">Financiamento</h2>
+        <p class="feature-card-desc">
+          Acompanhe seu financiamento: parcelas, juros pagos,
+          saldo devedor e a evolução ao longo do tempo.
+        </p>
+        <span class="feature-card-cta">Acessar →</span>
+      </a>
+
+      <a routerLink="/despesas" class="feature-card">
+        <span class="feature-card-icon">◆</span>
+        <h2 class="feature-card-title">Despesas & Receitas</h2>
+        <p class="feature-card-desc">
+          Planeje suas receitas e despesas fixas mensais
+          e visualize seu saldo disponível.
+        </p>
+        <span class="feature-card-cta">Acessar →</span>
+      </a>
+    </div>
+  </div>
+</div>
