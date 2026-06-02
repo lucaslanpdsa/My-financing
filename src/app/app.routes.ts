@@ -9,7 +9,12 @@ export const routes: Routes = [
     canActivate: [authRedirectGuard],
   },
   {
-    path: 'dashboard',
+    path: '',
+    loadComponent: () => import('./features/home/home.component').then(m => m.HomeComponent),
+    canActivate: [authGuard],
+  },
+  {
+    path: 'financiamento',
     loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard],
   },
@@ -18,5 +23,5 @@ export const routes: Routes = [
     loadComponent: () => import('./features/despesas/despesas.component').then(m => m.DespesasComponent),
     canActivate: [authGuard],
   },
-  { path: '**', redirectTo: 'dashboard' },
+  { path: '**', redirectTo: '' },
 ];
