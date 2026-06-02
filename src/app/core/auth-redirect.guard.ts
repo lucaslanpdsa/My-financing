@@ -7,6 +7,6 @@ export const authRedirectGuard: CanActivateFn = async () => {
   const router = inject(Router);
 
   const { data: { session } } = await supabase.auth.getSession();
-  if (session?.user) return router.createUrlTree(['/dashboard']);
+  if (session?.user) return router.createUrlTree(['/']);
   return true;
 };
