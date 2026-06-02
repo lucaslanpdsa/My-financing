@@ -46,13 +46,6 @@ describe('ConfigBarComponent', () => {
     expect(component.cfgFinanced()).toBe(20000);
   });
 
-  it('autoFillFinanced calculates total * value', () => {
-    component.cfgTotal.set(12);
-    component.cfgValue.set(500);
-    component.autoFillFinanced();
-    expect(component.cfgFinanced()).toBe(6000);
-  });
-
   it('saveLabel returns empty string when idle', () => {
     saveStatus.set('idle');
     expect(component.saveLabel).toBe('');

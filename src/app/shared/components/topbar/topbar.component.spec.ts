@@ -7,7 +7,7 @@ import { provideRouter } from '@angular/router';
 
 const mockAuth = {
   currentUser: signal({ id: 'u1', email: 'test@test.com' } as any),
-  logout: jasmine.createSpy('logout').and.resolveTo(),
+  logout: vi.fn().mockResolvedValue(undefined),
 };
 
 describe('TopbarComponent', () => {
