@@ -31,4 +31,8 @@ export class DespesasComponent implements OnInit {
     }
     this.isLoading.set(false);
   }
+
+  async logout(): Promise<void> {
+    await this.auth.logout();
+  }
 }
