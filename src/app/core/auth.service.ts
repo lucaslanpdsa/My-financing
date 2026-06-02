@@ -26,7 +26,10 @@ export class AuthService {
       if (session?.user) {
         this.currentUser.set(session.user);
         this.accessToken.set(session.access_token ?? null);
-        if (event === 'SIGNED_IN') this.router.navigate(['/dashboard']);
+        // Only redirect on explicit login (from /auth), not on token refresh or page reload
+        if (event === 'SIGNED_IN' && this.router.url.startsWith('/auth')) {
+          this.router.navigate(['/dashboard']);
+        }
       } else if (event === 'SIGNED_OUT') {
         this.currentUser.set(null);
         this.accessToken.set(null);
