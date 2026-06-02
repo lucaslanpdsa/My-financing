@@ -58,6 +58,11 @@ export class TransacoesTableComponent {
     await this.budget.removeTransaction(this.auth.currentUser()!.id, id);
   }
 
+  async clear(): Promise<void> {
+    if (!confirm('Zerar todas as transações variáveis?')) return;
+    await this.budget.clearTransactions(this.auth.currentUser()!.id);
+  }
+
   cancelAdd(): void {
     this.newNome  = '';
     this.newValor = null;

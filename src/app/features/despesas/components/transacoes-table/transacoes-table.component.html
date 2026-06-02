@@ -1,9 +1,14 @@
 <div class="table-wrap">
   <div class="table-hdr">
     <span class="table-t">Transações Variáveis</span>
-    @if (!isAdding()) {
-      <button class="btn-add-trans" (click)="isAdding.set(true)">+ Adicionar</button>
-    }
+    <div class="hdr-actions">
+      @if (budget.transactions().length > 0) {
+        <button class="btn-clear" (click)="clear()">Zerar</button>
+      }
+      @if (!isAdding()) {
+        <button class="btn-add-trans" (click)="isAdding.set(true)">+ Adicionar</button>
+      }
+    </div>
   </div>
 
   @if (isAdding()) {

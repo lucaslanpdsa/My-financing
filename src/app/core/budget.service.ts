@@ -67,4 +67,10 @@ export class BudgetService {
     if (error) throw error;
     this.transactions.update(list => list.filter(t => t.id !== id));
   }
+
+  async clearTransactions(userId: string): Promise<void> {
+    const { error } = await this.sb.from('transacoes').delete().eq('user_id', userId);
+    if (error) throw error;
+    this.transactions.set([]);
+  }
 }
