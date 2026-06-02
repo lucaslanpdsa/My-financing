@@ -1,9 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../../core/auth.service';
 import { BudgetService } from '../../../../core/budget.service';
 import { BudgetItemType } from '../../../../core/models';
 import { FmtCurrencyPipe } from '../../../../shared/pipes/fmt-currency.pipe';
+
+const MONTH_LABELS = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+                      'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
 @Component({
   selector: 'app-transacoes-table',
@@ -24,6 +27,30 @@ export class TransacoesTableComponent {
   newTipo: BudgetItemType = 'despesa';
   newData  = '';
 
+  readonly currentMonthKey = computed(() => this.budget.monthKey(new Date()));
+
+  readonly isCurrentMonth = computed(() =>
+    this.budget.selectedMonth() === this.currentMonthKey()
+  );
+
+  readonly monthLabel = computed(() => {
+    const [y, m] = this.budget.selectedMonth().split('-').map(Number);
+    return `${MONTH_LABELS[m - 1]} ${y}`;
+  });
+
+  prevMonth(): void {
+    const [y, m] = this.budget.selectedMonth().split('-').map(Number);
+    const d = new Date(y, m - 2);
+    this.budget.selectedMonth.set(this.budget.monthKey(d));
+  }
+
+  nextMonth(): void {
+    if (this.isCurrentMonth()) return;
+    const [y, m] = this.budget.selectedMonth().split('-').map(Number);
+    const d = new Date(y, m);
+    this.budget.selectedMonth.set(this.budget.monthKey(d));
+  }
+
   formatDate(data: string | null): string {
     if (!data) return '—';
     const [y, m, d] = data.split('-');
@@ -39,9 +66,7 @@ export class TransacoesTableComponent {
     try {
       await this.budget.addTransaction(
         this.auth.currentUser()!.id,
-        this.newTipo,
-        nome,
-        valor,
+        this.newTipo, nome, valor,
         this.newData || null,
       );
       this.newNome  = '';
@@ -56,11 +81,6 @@ export class TransacoesTableComponent {
 
   async remove(id: string): Promise<void> {
     await this.budget.removeTransaction(this.auth.currentUser()!.id, id);
-  }
-
-  async clear(): Promise<void> {
-    if (!confirm('Zerar todas as transações variáveis?')) return;
-    await this.budget.clearTransactions(this.auth.currentUser()!.id);
   }
 
   cancelAdd(): void {

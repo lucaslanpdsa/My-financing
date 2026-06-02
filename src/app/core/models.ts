@@ -29,5 +29,6 @@ export interface Transaction {
   tipo: BudgetItemType;
   nome: string;
   valor: number;
-  data: string | null; // format: yyyy-mm-dd
+  data: string | null;     // yyyy-mm-dd (optional display date)
+  createdAt: string;       // ISO — used as fallback month when data is null
 }

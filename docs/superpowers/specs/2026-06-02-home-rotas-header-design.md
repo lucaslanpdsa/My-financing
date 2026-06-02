@@ -32,11 +32,16 @@ Criar uma home page de entrada que apresente as funcionalidades do app de forma 
 
 Componente standalone que substitui o bloco `<div class="topbar">` duplicado em `DashboardComponent` e `DespesasComponent`.
 
+### Dependências
+
+- Injeta `AuthService` para exibir `currentUser()?.email` e chamar `logout()`.
+- Usa `RouterLink` e `RouterLinkActive` do Angular Router — sem lógica manual de rota ativa.
+
 ### Comportamento
 
-- Usa `Router` e `NavigationEnd` (ou `RouterLinkActive`) para destacar o link ativo.
-- Exibe email do usuário via `AuthService.currentUser()?.email`.
-- Botão "Sair" chama `AuthService.logout()` em todas as telas.
+- `routerLinkActive="nav-link--active"` marca o link ativo automaticamente.
+- Botão "Sair" chama `auth.logout()` e redireciona para `/auth` (comportamento já existente no `AuthService`).
+- Email exibido com `auth.currentUser()?.email`.
 
 ### Template (estrutura)
 

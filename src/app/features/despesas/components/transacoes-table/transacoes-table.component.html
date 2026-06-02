@@ -2,10 +2,12 @@
   <div class="table-hdr">
     <span class="table-t">Transações Variáveis</span>
     <div class="hdr-actions">
-      @if (budget.transactions().length > 0) {
-        <button class="btn-clear" (click)="clear()">Zerar</button>
-      }
-      @if (!isAdding()) {
+      <div class="month-nav">
+        <button class="month-btn" (click)="prevMonth()">‹</button>
+        <span class="month-label">{{ monthLabel() }}</span>
+        <button class="month-btn" (click)="nextMonth()" [disabled]="isCurrentMonth()">›</button>
+      </div>
+      @if (!isAdding() && isCurrentMonth()) {
         <button class="btn-add-trans" (click)="isAdding.set(true)">+ Adicionar</button>
       }
     </div>
@@ -17,7 +19,7 @@
         <option value="despesa">Despesa</option>
         <option value="receita">Receita</option>
       </select>
-      <input class="add-input" type="text"   [(ngModel)]="newNome"  placeholder="Descrição"/>
+      <input class="add-input" type="text" [(ngModel)]="newNome" placeholder="Descrição"/>
       <input class="add-input add-input--val" type="number" [(ngModel)]="newValor" placeholder="Valor" min="0.01" step="0.01"/>
       <input class="add-input add-input--date" type="date" [(ngModel)]="newData"/>
       <button class="btn-confirm" [disabled]="isSaving()" (click)="add()">
@@ -27,9 +29,11 @@
     </div>
   }
 
-  @if (budget.transactions().length === 0 && !isAdding()) {
-    <div class="empty-msg">Nenhuma transação variável registrada.</div>
-  } @else if (budget.transactions().length > 0) {
+  @if (budget.filteredTransactions().length === 0 && !isAdding()) {
+    <div class="empty-msg">
+      Nenhuma transação em {{ monthLabel() }}.
+    </div>
+  } @else if (budget.filteredTransactions().length > 0) {
     <table>
       <thead>
         <tr>
@@ -41,7 +45,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (t of budget.transactions(); track t.id) {
+        @for (t of budget.filteredTransactions(); track t.id) {
           <tr>
             <td><div class="ti"><span class="nm">{{ formatDate(t.data) }}</span></div></td>
             <td><div class="ti">{{ t.nome }}</div></td>

@@ -15,18 +15,33 @@ export class BudgetService {
   readonly saldo         = computed(() => this.totalReceitas() - this.totalDespesas());
 
   // Variable transactions
-  readonly transactions      = signal<Transaction[]>([]);
-  readonly varReceitas       = computed(() => this.transactions().filter(t => t.tipo === 'receita'));
-  readonly varDespesas       = computed(() => this.transactions().filter(t => t.tipo === 'despesa'));
-  readonly totalVarReceitas  = computed(() => this.varReceitas().reduce((s, t) => s + t.valor, 0));
-  readonly totalVarDespesas  = computed(() => this.varDespesas().reduce((s, t) => s + t.valor, 0));
-  readonly saldoVariavel     = computed(() => this.totalVarReceitas() - this.totalVarDespesas());
-  readonly saldoTotal        = computed(() => this.saldo() + this.saldoVariavel());
+  readonly transactions  = signal<Transaction[]>([]);
+  readonly selectedMonth = signal<string>(this.monthKey(new Date()));
+
+  readonly filteredTransactions = computed(() => {
+    const month = this.selectedMonth();
+    return this.transactions().filter(t => this.transactionMonthKey(t) === month);
+  });
+
+  readonly varReceitas      = computed(() => this.filteredTransactions().filter(t => t.tipo === 'receita'));
+  readonly varDespesas      = computed(() => this.filteredTransactions().filter(t => t.tipo === 'despesa'));
+  readonly totalVarReceitas = computed(() => this.varReceitas().reduce((s, t) => s + t.valor, 0));
+  readonly totalVarDespesas = computed(() => this.varDespesas().reduce((s, t) => s + t.valor, 0));
+  readonly saldoVariavel    = computed(() => this.totalVarReceitas() - this.totalVarDespesas());
+  readonly saldoTotal       = computed(() => this.saldo() + this.saldoVariavel());
+
+  monthKey(date: Date): string {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  private transactionMonthKey(t: Transaction): string {
+    return t.data ? t.data.substring(0, 7) : t.createdAt.substring(0, 7);
+  }
 
   async loadAll(userId: string): Promise<void> {
     const [itemsResult, transResult] = await Promise.all([
       this.sb.from('orcamento_items').select('*').eq('user_id', userId).order('created_at'),
-      this.sb.from('transacoes').select('*').eq('user_id', userId).order('data', { ascending: false }).order('created_at', { ascending: false }),
+      this.sb.from('transacoes').select('*').eq('user_id', userId).order('created_at', { ascending: false }),
     ]);
 
     this.items.set((itemsResult.data ?? []).map((r: any) => ({
@@ -34,7 +49,8 @@ export class BudgetService {
     })));
 
     this.transactions.set((transResult.data ?? []).map((r: any) => ({
-      id: r.id, tipo: r.tipo, nome: r.nome, valor: r.valor, data: r.data,
+      id: r.id, tipo: r.tipo, nome: r.nome, valor: r.valor,
+      data: r.data, createdAt: r.created_at,
     })));
   }
 
@@ -59,18 +75,14 @@ export class BudgetService {
       .insert({ user_id: userId, tipo, nome, valor, data: data || null })
       .select().single();
     if (error) throw error;
-    this.transactions.update(list => [{ id: row.id, tipo, nome, valor, data: row.data }, ...list]);
+    this.transactions.update(list => [{
+      id: row.id, tipo, nome, valor, data: row.data, createdAt: row.created_at,
+    }, ...list]);
   }
 
   async removeTransaction(userId: string, id: string): Promise<void> {
     const { error } = await this.sb.from('transacoes').delete().eq('id', id).eq('user_id', userId);
     if (error) throw error;
     this.transactions.update(list => list.filter(t => t.id !== id));
-  }
-
-  async clearTransactions(userId: string): Promise<void> {
-    const { error } = await this.sb.from('transacoes').delete().eq('user_id', userId);
-    if (error) throw error;
-    this.transactions.set([]);
   }
 }
