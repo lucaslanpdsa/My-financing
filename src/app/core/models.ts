@@ -23,3 +23,11 @@ export interface BudgetItem {
   nome: string;
   valor: number;
 }
+
+export interface Transaction {
+  id: string;
+  tipo: BudgetItemType;
+  nome: string;
+  valor: number;
+  data: string | null; // format: yyyy-mm-dd
+}

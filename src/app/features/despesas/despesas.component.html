@@ -14,15 +14,39 @@
     @if (isLoading()) {
       <div class="loading"><span class="dot-anim">Carregando</span></div>
     } @else {
-      <div class="budget-grid">
+
+      <!-- Fixed section: 3 columns -->
+      <div class="fixed-section">
         <app-budget-column tipo="receita" />
         <app-budget-column tipo="despesa" />
+        <div class="saldo-fixo-card">
+          <div class="saldo-fixo-label">Saldo Fixo</div>
+          <div class="saldo-fixo-valor" [class.negativo]="budget.saldo() < 0">
+            {{ budget.saldo() | fmtCurrency }}
+          </div>
+          <div class="saldo-fixo-sub">
+            <span>Receitas {{ budget.totalReceitas() | fmtCurrency }}</span>
+            <span>Despesas {{ budget.totalDespesas() | fmtCurrency }}</span>
+          </div>
+        </div>
       </div>
 
-      <div class="saldo-bar" [class.saldo-bar--negativo]="budget.saldo() < 0">
-        <span class="saldo-label">Saldo restante</span>
-        <span class="saldo-valor">{{ budget.saldo() | fmtCurrency }}</span>
+      <!-- Variable transactions -->
+      <app-transacoes-table />
+
+      <!-- Total balance -->
+      <div class="saldo-total-bar" [class.saldo-total-bar--negativo]="budget.saldoTotal() < 0">
+        <div class="saldo-total-breakdown">
+          <span>Fixo <strong>{{ budget.saldo() | fmtCurrency }}</strong></span>
+          <span class="sep">+</span>
+          <span>Variável <strong>{{ budget.saldoVariavel() | fmtCurrency }}</strong></span>
+        </div>
+        <div class="saldo-total-result">
+          <span class="saldo-label">Saldo Total</span>
+          <span class="saldo-valor">{{ budget.saldoTotal() | fmtCurrency }}</span>
+        </div>
       </div>
+
     }
   </div>
 </div>

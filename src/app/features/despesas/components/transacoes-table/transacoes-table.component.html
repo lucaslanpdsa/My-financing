@@ -1,0 +1,82 @@
+<div class="table-wrap">
+  <div class="table-hdr">
+    <span class="table-t">Transações Variáveis</span>
+    @if (!isAdding()) {
+      <button class="btn-add-trans" (click)="isAdding.set(true)">+ Adicionar</button>
+    }
+  </div>
+
+  @if (isAdding()) {
+    <div class="add-row">
+      <select class="add-select" [(ngModel)]="newTipo">
+        <option value="despesa">Despesa</option>
+        <option value="receita">Receita</option>
+      </select>
+      <input class="add-input" type="text"   [(ngModel)]="newNome"  placeholder="Descrição"/>
+      <input class="add-input add-input--val" type="number" [(ngModel)]="newValor" placeholder="Valor" min="0.01" step="0.01"/>
+      <input class="add-input add-input--date" type="date" [(ngModel)]="newData"/>
+      <button class="btn-confirm" [disabled]="isSaving()" (click)="add()">
+        {{ isSaving() ? '...' : 'Salvar' }}
+      </button>
+      <button class="btn-cancel" (click)="cancelAdd()">×</button>
+    </div>
+  }
+
+  @if (budget.transactions().length === 0 && !isAdding()) {
+    <div class="empty-msg">Nenhuma transação variável registrada.</div>
+  } @else if (budget.transactions().length > 0) {
+    <table>
+      <thead>
+        <tr>
+          <th style="width:90px">Data</th>
+          <th>Descrição</th>
+          <th style="width:90px">Tipo</th>
+          <th style="text-align:right;width:130px">Valor</th>
+          <th style="width:32px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (t of budget.transactions(); track t.id) {
+          <tr>
+            <td><div class="ti"><span class="nm">{{ formatDate(t.data) }}</span></div></td>
+            <td><div class="ti">{{ t.nome }}</div></td>
+            <td>
+              <div class="ti">
+                @if (t.tipo === 'receita') {
+                  <span class="pill pg">Receita</span>
+                } @else {
+                  <span class="pill pa">Despesa</span>
+                }
+              </div>
+            </td>
+            <td>
+              <div class="ti tr">
+                <span class="nm" [class.val-pos]="t.tipo === 'receita'" [class.val-neg]="t.tipo === 'despesa'">
+                  {{ t.tipo === 'receita' ? '+' : '-' }} {{ t.valor | fmtCurrency }}
+                </span>
+              </div>
+            </td>
+            <td>
+              <div class="ti tc">
+                <button class="item-remove" (click)="remove(t.id)" aria-label="remover">×</button>
+              </div>
+            </td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr class="sum-row">
+          <td colspan="3"><div class="ti" style="color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.05em">Total variável</div></td>
+          <td>
+            <div class="ti tr">
+              <span class="nm" [class.val-pos]="budget.saldoVariavel() >= 0" [class.val-neg]="budget.saldoVariavel() < 0">
+                {{ budget.saldoVariavel() | fmtCurrency }}
+              </span>
+            </div>
+          </td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  }
+</div>
