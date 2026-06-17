@@ -2,7 +2,6 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../core/auth.service';
-import { ThemeService } from '../../../core/theme.service';
 
 @Component({
   selector: 'app-topbar',
@@ -18,13 +17,6 @@ import { ThemeService } from '../../../core/theme.service';
         <a routerLink="/tarefas" routerLinkActive="nav-link--active" class="nav-link">Tarefas</a>
       </nav>
       <div class="topbar-right">
-        <button
-          type="button"
-          class="btn-theme"
-          (click)="theme.toggle()"
-          [attr.aria-label]="theme.theme() === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'"
-          [title]="theme.theme() === 'dark' ? 'Tema claro' : 'Tema escuro'"
-        >{{ theme.theme() === 'dark' ? '☀' : '☾' }}</button>
         <span class="user-email" id="user-email">{{ auth.currentUser()?.email }}</span>
         <button type="button" class="btn-logout" (click)="logout()">Sair</button>
       </div>
@@ -33,7 +25,6 @@ import { ThemeService } from '../../../core/theme.service';
 })
 export class TopbarComponent {
   protected readonly auth = inject(AuthService);
-  protected readonly theme = inject(ThemeService);
 
   async logout(): Promise<void> {
     await this.auth.logout();

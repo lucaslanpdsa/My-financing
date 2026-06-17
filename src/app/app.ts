@@ -1,6 +1,5 @@
-import { Component, inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ThemeService } from './core/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -8,7 +7,4 @@ import { ThemeService } from './core/theme.service';
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
-export class App {
-  // Injetado no root para aplicar o tema (claro/escuro) desde o início, em qualquer rota.
-  private readonly theme = inject(ThemeService);
-}
+export class App {}
