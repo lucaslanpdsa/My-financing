@@ -1,0 +1,40 @@
+<div class="tarefa-form">
+  <input
+    type="text"
+    class="tf-input"
+    [(ngModel)]="titulo"
+    placeholder="Título da tarefa"
+    (keyup.enter)="submit()"
+    autofocus
+  />
+
+  <textarea
+    class="tf-input tf-textarea"
+    [(ngModel)]="descricao"
+    placeholder="Descrição (opcional)"
+    rows="2"
+  ></textarea>
+
+  <div class="tf-row">
+    <label class="tf-field">
+      <span class="tf-label">Prazo</span>
+      <input type="date" class="tf-input" [(ngModel)]="prazo" />
+    </label>
+
+    <label class="tf-field">
+      <span class="tf-label">Prioridade</span>
+      <select class="tf-input" [(ngModel)]="prioridade">
+        <option value="baixa">Baixa</option>
+        <option value="media">Média</option>
+        <option value="alta">Alta</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="tf-actions">
+    <button type="button" class="btn-confirm" [disabled]="isSaving() || !titulo.trim()" (click)="submit()">
+      {{ isEdit() ? 'Salvar' : 'Adicionar' }}
+    </button>
+    <button type="button" class="btn-cancel" (click)="cancel.emit()">Cancelar</button>
+  </div>
+</div>

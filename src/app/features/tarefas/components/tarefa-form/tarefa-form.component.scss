@@ -1,0 +1,84 @@
+.tarefa-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+
+.tf-input {
+  font-family: var(--sans);
+  font-size: 13px;
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 8px 10px;
+  background: #fff;
+  color: var(--text);
+  outline: none;
+  width: 100%;
+
+  &:focus { border-color: var(--accent); }
+}
+
+.tf-textarea {
+  resize: vertical;
+  min-height: 38px;
+}
+
+.tf-row {
+  display: flex;
+  gap: 8px;
+
+  @media (max-width: 480px) { flex-direction: column; }
+}
+
+.tf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.tf-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tf-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-confirm {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 7px 14px;
+  cursor: pointer;
+
+  &:hover { background: var(--accent2); }
+  &:disabled { opacity: .5; cursor: not-allowed; }
+}
+
+.btn-cancel {
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border2);
+  border-radius: 7px;
+  padding: 7px 14px;
+  cursor: pointer;
+
+  &:hover { color: var(--text); }
+}

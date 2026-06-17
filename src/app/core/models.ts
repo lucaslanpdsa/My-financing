@@ -32,3 +32,22 @@ export interface Transaction {
   data: string | null;     // yyyy-mm-dd (optional display date)
   createdAt: string;       // ISO — used as fallback month when data is null
 }
+
+export type TaskPriority = 'baixa' | 'media' | 'alta';
+
+export interface TaskGroup {
+  id: string;
+  nome: string;
+  createdAt: string;
+}
+
+export interface Task {
+  id: string;
+  grupoId: string;
+  titulo: string;
+  descricao: string | null;
+  concluida: boolean;
+  prazo: string | null;    // yyyy-mm-dd
+  prioridade: TaskPriority;
+  createdAt: string;
+}

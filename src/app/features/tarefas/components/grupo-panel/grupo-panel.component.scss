@@ -1,0 +1,104 @@
+.grupo-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gp-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gp-nome {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gp-collapse {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.gp-chevron {
+  color: var(--muted);
+  font-size: 11px;
+  transition: transform .15s;
+
+  &--open { transform: rotate(90deg); }
+}
+
+.gp-count {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+.gp-header-actions {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+
+.gp-icon {
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 14px;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  cursor: pointer;
+
+  &:hover { background: var(--bg); color: var(--text); }
+  &--del:hover { color: var(--red); }
+}
+
+.gp-rename-input {
+  flex: 1;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid var(--accent);
+  border-radius: 7px;
+  padding: 5px 8px;
+  outline: none;
+}
+
+.gp-tarefas {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gp-empty {
+  font-size: 12px;
+  color: var(--muted);
+  padding: 4px 2px;
+}
+
+.gp-add-tarefa {
+  align-self: flex-start;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--accent);
+  background: transparent;
+  border: 1px dashed var(--border2);
+  border-radius: 7px;
+  padding: 7px 12px;
+  cursor: pointer;
+  width: 100%;
+
+  &:hover { border-color: var(--accent); background: var(--accent-light); }
+}

@@ -26,9 +26,9 @@ describe('HomeComponent', () => {
     fixture.detectChanges();
   });
 
-  it('renders two feature cards', () => {
+  it('renders three feature cards', () => {
     const cards = fixture.nativeElement.querySelectorAll('.feature-card');
-    expect(cards.length).toBe(2);
+    expect(cards.length).toBe(3);
   });
 
   it('first card links to /financiamento', () => {
@@ -39,5 +39,10 @@ describe('HomeComponent', () => {
   it('second card links to /despesas', () => {
     const cards = fixture.nativeElement.querySelectorAll('.feature-card');
     expect(cards[1].getAttribute('href')).toBe('/despesas');
+  });
+
+  it('third card links to /tarefas', () => {
+    const cards = fixture.nativeElement.querySelectorAll('.feature-card');
+    expect(cards[2].getAttribute('href')).toBe('/tarefas');
   });
 });

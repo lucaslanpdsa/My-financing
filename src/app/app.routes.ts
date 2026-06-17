@@ -23,5 +23,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/despesas/despesas.component').then(m => m.DespesasComponent),
     canActivate: [authGuard],
   },
+  {
+    path: 'tarefas',
+    loadComponent: () => import('./features/tarefas/tarefas.component').then(m => m.TarefasComponent),
+    canActivate: [authGuard],
+  },
   { path: '**', redirectTo: '' },
 ];

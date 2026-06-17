@@ -48,8 +48,8 @@ describe('TopbarComponent', () => {
     expect(mockAuth.logout).toHaveBeenCalled();
   });
 
-  it('renders three nav links', () => {
+  it('renders four nav links', () => {
     const links = fixture.nativeElement.querySelectorAll('.nav-link');
-    expect(links.length).toBe(3);
+    expect(links.length).toBe(4);
   });
 });

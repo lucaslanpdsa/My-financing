@@ -1,0 +1,48 @@
+<div class="grupo-panel">
+  <div class="gp-header">
+    @if (isRenaming()) {
+      <input
+        type="text"
+        class="gp-rename-input"
+        [(ngModel)]="nomeEdit"
+        (keyup.enter)="saveRename()"
+        (keyup.escape)="isRenaming.set(false)"
+        autofocus
+      />
+      <button type="button" class="gp-icon" (click)="saveRename()" aria-label="salvar nome">✓</button>
+      <button type="button" class="gp-icon" (click)="isRenaming.set(false)" aria-label="cancelar">×</button>
+    } @else {
+      @if (collapsible()) {
+        <button type="button" class="gp-collapse" (click)="isCollapsed.set(!isCollapsed())">
+          <span class="gp-chevron" [class.gp-chevron--open]="!isCollapsed()">▸</span>
+          <span class="gp-nome">{{ grupo().nome }}</span>
+        </button>
+      } @else {
+        <span class="gp-nome">{{ grupo().nome }}</span>
+      }
+      <span class="gp-count">{{ pendentes() }}</span>
+      <div class="gp-header-actions">
+        <button type="button" class="gp-icon" (click)="startRename()" aria-label="renomear grupo">✎</button>
+        <button type="button" class="gp-icon gp-icon--del" (click)="removeGrupo()" aria-label="excluir grupo">×</button>
+      </div>
+    }
+  </div>
+
+  @if (!collapsible() || !isCollapsed()) {
+    <div class="gp-tarefas">
+      @for (tarefa of tarefas(); track tarefa.id) {
+        <app-tarefa-item [tarefa]="tarefa" />
+      } @empty {
+        @if (!isAddingTarefa()) {
+          <p class="gp-empty">Nenhuma tarefa neste grupo.</p>
+        }
+      }
+    </div>
+
+    @if (isAddingTarefa()) {
+      <app-tarefa-form (save)="addTarefa($event)" (cancel)="isAddingTarefa.set(false)" />
+    } @else {
+      <button type="button" class="gp-add-tarefa" (click)="isAddingTarefa.set(true)">+ Nova tarefa</button>
+    }
+  }
+</div>

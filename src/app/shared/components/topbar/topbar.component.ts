@@ -14,6 +14,7 @@ import { AuthService } from '../../../core/auth.service';
         <a routerLink="/" routerLinkActive="nav-link--active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">Home</a>
         <a routerLink="/financiamento" routerLinkActive="nav-link--active" class="nav-link">Financiamento</a>
         <a routerLink="/despesas" routerLinkActive="nav-link--active" class="nav-link">Despesas & Receitas</a>
+        <a routerLink="/tarefas" routerLinkActive="nav-link--active" class="nav-link">Tarefas</a>
       </nav>
       <div class="topbar-right">
         <span class="user-email" id="user-email">{{ auth.currentUser()?.email }}</span>

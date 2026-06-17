@@ -1,0 +1,41 @@
+@if (isEditing()) {
+  <app-tarefa-form
+    [tarefa]="tarefa()"
+    (save)="saveEdit($event)"
+    (cancel)="isEditing.set(false)"
+  />
+} @else {
+  <div class="tarefa-item" [class.tarefa-item--done]="tarefa().concluida">
+    <button
+      type="button"
+      class="ti-check"
+      [class.ti-check--done]="tarefa().concluida"
+      (click)="toggle()"
+      [attr.aria-label]="tarefa().concluida ? 'marcar como não concluída' : 'marcar como concluída'"
+    >
+      @if (tarefa().concluida) { ✓ }
+    </button>
+
+    <div class="ti-body">
+      <div class="ti-top">
+        <span class="ti-titulo">{{ tarefa().titulo }}</span>
+        <span class="ti-prio" [class]="'ti-prio--' + tarefa().prioridade">
+          {{ prioridadeLabel[tarefa().prioridade] }}
+        </span>
+      </div>
+
+      @if (tarefa().descricao) {
+        <p class="ti-desc">{{ tarefa().descricao }}</p>
+      }
+
+      @if (tarefa().prazo) {
+        <span class="ti-prazo">⏱ {{ tarefa().prazo }}</span>
+      }
+    </div>
+
+    <div class="ti-actions">
+      <button type="button" class="ti-btn" (click)="isEditing.set(true)" aria-label="editar">✎</button>
+      <button type="button" class="ti-btn ti-btn--del" (click)="remove()" aria-label="excluir">×</button>
+    </div>
+  </div>
+}
