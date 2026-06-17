@@ -1,15 +1,5 @@
 <div id="despesas-screen">
-  <div class="topbar">
-    <span class="topbar-logo">◆ Financiamento</span>
-    <nav class="topbar-nav">
-      <a routerLink="/dashboard" class="nav-link">Financiamento</a>
-      <a routerLink="/despesas" class="nav-link nav-link--active">Despesas & Receitas</a>
-    </nav>
-    <div class="topbar-right">
-      <span class="user-email">{{ auth.currentUser()?.email }}</span>
-      <button class="btn-logout" (click)="logout()">Sair</button>
-    </div>
-  </div>
+  <app-topbar />
 
   <div class="app">
     @if (isLoading()) {

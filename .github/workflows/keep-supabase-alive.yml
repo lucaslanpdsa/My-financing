@@ -1,0 +1,37 @@
+name: Keep Supabase Alive
+
+# O plano gratuito do Supabase pausa o projeto apos 7 dias sem atividade.
+# Este workflow faz uma consulta leve no banco a cada 2 dias para manter o
+# projeto ativo e a aplicacao sempre no ar.
+
+on:
+  schedule:
+    # A cada 2 dias, as 12:00 UTC (cron usa sempre horario UTC)
+    - cron: '0 12 */2 * *'
+  workflow_dispatch: # permite rodar manualmente pela aba Actions do GitHub
+
+# Estes valores ja sao publicos (estao no bundle do front-end e a anon key e
+# protegida por RLS). Se preferir, mova-os para Settings > Secrets and variables
+# > Actions e use ${{ secrets.SUPABASE_URL }} / ${{ secrets.SUPABASE_ANON_KEY }}.
+env:
+  SUPABASE_URL: https://snwxkkeprebkaoudjsuj.supabase.co
+  SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNud3hra2VwcmVia2FvdWRqc3VqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0Mjg3NDksImV4cCI6MjA5NjAwNDc0OX0.a9yR3SZL-IPMZGg_DY1fBVTAkcaURwx5UK-fn68BL9I
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Consultar o banco para manter o Supabase ativo
+        run: |
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${SUPABASE_URL}/rest/v1/parcelas?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}")
+          echo "Supabase respondeu com HTTP $HTTP_CODE"
+          # 2xx = ok; 4xx (ex: RLS sem linhas) ainda conta como atividade no banco.
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 500 ]; then
+            echo "Supabase esta ativo."
+          else
+            echo "Resposta inesperada do Supabase."
+            exit 1
+          fi

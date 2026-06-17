@@ -1,15 +1,15 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { BudgetService } from '../../core/budget.service';
 import { FmtCurrencyPipe } from '../../shared/pipes/fmt-currency.pipe';
+import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { BudgetColumnComponent } from './components/budget-column/budget-column.component';
 import { TransacoesTableComponent } from './components/transacoes-table/transacoes-table.component';
 
 @Component({
   selector: 'app-despesas',
   standalone: true,
-  imports: [RouterLink, BudgetColumnComponent, TransacoesTableComponent, FmtCurrencyPipe],
+  imports: [TopbarComponent, BudgetColumnComponent, TransacoesTableComponent, FmtCurrencyPipe],
   templateUrl: './despesas.component.html',
   styleUrl: './despesas.component.scss',
 })
@@ -30,9 +30,5 @@ export class DespesasComponent implements OnInit {
       }
     }
     this.isLoading.set(false);
-  }
-
-  async logout(): Promise<void> {
-    await this.auth.logout();
   }
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { FinancingService } from '../../core/financing.service';
+import { TopbarComponent } from '../../shared/components/topbar/topbar.component';
 import { ChartsComponent } from './components/charts/charts.component';
 import { ConfigBarComponent } from './components/config-bar/config-bar.component';
 import { JurosBoxComponent } from './components/juros-box/juros-box.component';
@@ -13,7 +13,7 @@ import { ProgressBarComponent } from './components/progress-bar/progress-bar.com
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    RouterLink,
+    TopbarComponent,
     ConfigBarComponent,
     JurosBoxComponent,
     KpisComponent,
@@ -41,9 +41,5 @@ export class DashboardComponent implements OnInit {
       }
     }
     this.isLoading.set(false);
-  }
-
-  async logout(): Promise<void> {
-    await this.auth.logout();
   }
 }
