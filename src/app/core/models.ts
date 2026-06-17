@@ -35,7 +35,7 @@ export interface Transaction {
 
 export type TaskPriority = 'baixa' | 'media' | 'alta';
 
-export interface TaskGroup {
+export interface TaskList {
   id: string;
   nome: string;
   createdAt: string;
@@ -43,7 +43,7 @@ export interface TaskGroup {
 
 export interface Task {
   id: string;
-  grupoId: string;
+  listaId: string | null;  // null = tarefa avulsa (sem lista)
   titulo: string;
   descricao: string | null;
   concluida: boolean;

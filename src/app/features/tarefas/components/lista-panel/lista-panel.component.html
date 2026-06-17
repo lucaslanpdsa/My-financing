@@ -1,0 +1,50 @@
+<div class="lista-panel">
+  <div class="lp-header">
+    @if (isRenaming()) {
+      <input
+        type="text"
+        class="lp-rename-input"
+        [(ngModel)]="nomeEdit"
+        (keyup.enter)="saveRename()"
+        (keyup.escape)="isRenaming.set(false)"
+        autofocus
+      />
+      <button type="button" class="lp-icon" (click)="saveRename()" aria-label="salvar nome">✓</button>
+      <button type="button" class="lp-icon" (click)="isRenaming.set(false)" aria-label="cancelar">×</button>
+    } @else {
+      @if (collapsible()) {
+        <button type="button" class="lp-collapse" (click)="isCollapsed.set(!isCollapsed())">
+          <span class="lp-chevron" [class.lp-chevron--open]="!isCollapsed()">▸</span>
+          <span class="lp-nome" [class.lp-nome--avulsas]="isAvulsas()">{{ nome() }}</span>
+        </button>
+      } @else {
+        <span class="lp-nome" [class.lp-nome--avulsas]="isAvulsas()">{{ nome() }}</span>
+      }
+      <span class="lp-count">{{ pendentes() }}</span>
+      @if (!isAvulsas()) {
+        <div class="lp-header-actions">
+          <button type="button" class="lp-icon" (click)="startRename()" aria-label="renomear lista">✎</button>
+          <button type="button" class="lp-icon lp-icon--del" (click)="removeLista()" aria-label="excluir lista">×</button>
+        </div>
+      }
+    }
+  </div>
+
+  @if (!collapsible() || !isCollapsed()) {
+    <div class="lp-tarefas">
+      @for (tarefa of tarefas(); track tarefa.id) {
+        <app-tarefa-item [tarefa]="tarefa" />
+      } @empty {
+        @if (!isAddingTarefa()) {
+          <p class="lp-empty">Nenhuma tarefa aqui.</p>
+        }
+      }
+    </div>
+
+    @if (isAddingTarefa()) {
+      <app-tarefa-form (save)="addTarefa($event)" (cancel)="isAddingTarefa.set(false)" />
+    } @else {
+      <button type="button" class="lp-add-tarefa" (click)="isAddingTarefa.set(true)">+ Nova tarefa</button>
+    }
+  }
+</div>

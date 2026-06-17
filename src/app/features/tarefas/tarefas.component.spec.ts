@@ -4,7 +4,7 @@ import { provideRouter } from '@angular/router';
 import { TarefasComponent } from './tarefas.component';
 import { AuthService } from '../../core/auth.service';
 import { TasksService } from '../../core/tasks.service';
-import { TaskGroup } from '../../core/models';
+import { Task, TaskList } from '../../core/models';
 
 const mockAuth = {
   currentUser: signal({ id: 'u1', email: 'test@test.com' } as any),
@@ -12,14 +12,17 @@ const mockAuth = {
   waitForAuth: async () => {},
 };
 
-const grupos = signal<TaskGroup[]>([]);
+const listas = signal<TaskList[]>([]);
+const tarefas = signal<Task[]>([]);
 
 const mockTasks = {
-  grupos,
-  tarefas: signal([]),
-  tarefasDoGrupo: () => signal([]),
+  listas,
+  tarefas,
+  tarefasAvulsas: signal<Task[]>([]),
+  tarefasDaLista: () => signal([]),
   loadAll: async () => {},
-  addGrupo: async () => {},
+  addLista: async () => {},
+  addTarefa: async () => {},
 };
 
 describe('TarefasComponent', () => {
@@ -27,7 +30,9 @@ describe('TarefasComponent', () => {
   let fixture: ComponentFixture<TarefasComponent>;
 
   beforeEach(async () => {
-    grupos.set([]);
+    listas.set([]);
+    tarefas.set([]);
+    (mockTasks.tarefasAvulsas as any).set([]);
     localStorage.clear();
 
     await TestBed.configureTestingModule({
@@ -52,7 +57,7 @@ describe('TarefasComponent', () => {
     expect(btns.length).toBe(3);
   });
 
-  it('shows empty state when there are no groups', async () => {
+  it('shows empty state when there are no lists or standalone tasks', async () => {
     await fixture.whenStable();
     component.isLoading.set(false);
     fixture.detectChanges();
@@ -65,12 +70,25 @@ describe('TarefasComponent', () => {
     expect(localStorage.getItem('tarefas-layout')).toBe('acordeao');
   });
 
-  it('renders a group panel when a group exists', async () => {
-    grupos.set([{ id: 'g1', nome: 'Diárias', createdAt: '2026-01-01T00:00:00Z' }]);
+  it('renders a list panel when a list exists', async () => {
+    listas.set([{ id: 'l1', nome: 'Diárias', createdAt: '2026-01-01T00:00:00Z' }]);
     await fixture.whenStable();
     component.isLoading.set(false);
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('.layout-colunas')).toBeTruthy();
     expect(fixture.nativeElement.textContent).toContain('Diárias');
+  });
+
+  it('shows a "Sem lista" panel when there are standalone tasks', async () => {
+    (mockTasks.tarefasAvulsas as any).set([
+      { id: 't1', listaId: null, titulo: 'Avulsa', descricao: null, concluida: false, prazo: null, prioridade: 'media', createdAt: '2026-01-01T00:00:00Z' },
+    ]);
+    tarefas.set([
+      { id: 't1', listaId: null, titulo: 'Avulsa', descricao: null, concluida: false, prazo: null, prioridade: 'media', createdAt: '2026-01-01T00:00:00Z' },
+    ]);
+    await fixture.whenStable();
+    component.isLoading.set(false);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Sem lista');
   });
 });

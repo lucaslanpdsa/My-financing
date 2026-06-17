@@ -16,38 +16,48 @@
       <div class="loading"><span class="dot-anim">Carregando suas tarefas</span></div>
     } @else {
 
-      <!-- Form de novo grupo -->
-      @if (isAddingGrupo()) {
-        <div class="novo-grupo">
-          <input
-            type="text"
-            class="ng-input"
-            [(ngModel)]="newGrupoNome"
-            placeholder="Nome do grupo (ex: Tarefas diárias)"
-            (keyup.enter)="addGrupo()"
-            (keyup.escape)="cancelAddGrupo()"
-            autofocus
-          />
-          <button type="button" class="btn-confirm" [disabled]="!newGrupoNome.trim()" (click)="addGrupo()">Criar grupo</button>
-          <button type="button" class="btn-cancel" (click)="cancelAddGrupo()">Cancelar</button>
+      <!-- Ações: nova lista / nova tarefa avulsa -->
+      <div class="acoes-topo">
+        @if (isAddingLista()) {
+          <div class="nova-lista">
+            <input
+              type="text"
+              class="nl-input"
+              [(ngModel)]="newListaNome"
+              placeholder="Nome da lista (ex: Tarefas diárias)"
+              (keyup.enter)="addLista()"
+              (keyup.escape)="cancelAddLista()"
+              autofocus
+            />
+            <button type="button" class="btn-confirm" [disabled]="!newListaNome.trim()" (click)="addLista()">Criar lista</button>
+            <button type="button" class="btn-cancel" (click)="cancelAddLista()">Cancelar</button>
+          </div>
+        } @else {
+          <button type="button" class="btn-acao" (click)="isAddingLista.set(true)">+ Nova lista</button>
+          <button type="button" class="btn-acao btn-acao--ghost" (click)="isAddingTarefaAvulsa.set(true)">+ Nova tarefa avulsa</button>
+        }
+      </div>
+
+      <!-- Form de tarefa avulsa (sem lista) -->
+      @if (isAddingTarefaAvulsa()) {
+        <div class="form-avulsa">
+          <app-tarefa-form (save)="addTarefaAvulsa($event)" (cancel)="isAddingTarefaAvulsa.set(false)" />
         </div>
-      } @else {
-        <button type="button" class="btn-novo-grupo" (click)="isAddingGrupo.set(true)">+ Novo grupo</button>
       }
 
-      @if (grupos().length === 0) {
+      @if (vazio()) {
         <div class="vazio">
-          <p class="vazio-titulo">Nenhum grupo ainda.</p>
-          <p class="vazio-sub">Crie um grupo para começar a organizar suas tarefas.</p>
+          <p class="vazio-titulo">Nenhuma tarefa ainda.</p>
+          <p class="vazio-sub">Crie uma lista ou adicione uma tarefa avulsa para começar.</p>
         </div>
       } @else {
 
         <!-- LAYOUT: COLUNAS (kanban) -->
         @if (layout() === 'colunas') {
           <div class="layout-colunas">
-            @for (grupo of grupos(); track grupo.id) {
-              <div class="coluna-card">
-                <app-grupo-panel [grupo]="grupo" />
+            @for (painel of painels(); track painel.id) {
+              <div class="coluna-card" [class.coluna-card--avulsas]="painel.lista === null">
+                <app-lista-panel [lista]="painel.lista" />
               </div>
             }
           </div>
@@ -57,20 +67,21 @@
         @if (layout() === 'lista') {
           <div class="layout-lista">
             <aside class="lista-sidebar">
-              @for (grupo of grupos(); track grupo.id) {
+              @for (painel of painels(); track painel.id) {
                 <button
                   type="button"
                   class="sidebar-item"
-                  [class.sidebar-item--active]="grupoAtivo().id === grupo.id"
-                  (click)="selectGrupo(grupo.id)"
+                  [class.sidebar-item--active]="painelAtivo().id === painel.id"
+                  [class.sidebar-item--avulsas]="painel.lista === null"
+                  (click)="selectPainel(painel.id)"
                 >
-                  {{ grupo.nome }}
+                  {{ painel.nome }}
                 </button>
               }
             </aside>
             <div class="lista-painel coluna-card">
-              @if (grupoAtivo(); as ativo) {
-                <app-grupo-panel [grupo]="ativo" />
+              @if (painelAtivo(); as ativo) {
+                <app-lista-panel [lista]="ativo.lista" />
               }
             </div>
           </div>
@@ -79,9 +90,9 @@
         <!-- LAYOUT: ACORDEÃO -->
         @if (layout() === 'acordeao') {
           <div class="layout-acordeao">
-            @for (grupo of grupos(); track grupo.id) {
-              <div class="acordeao-card">
-                <app-grupo-panel [grupo]="grupo" [collapsible]="true" />
+            @for (painel of painels(); track painel.id) {
+              <div class="acordeao-card" [class.acordeao-card--avulsas]="painel.lista === null">
+                <app-lista-panel [lista]="painel.lista" [collapsible]="true" />
               </div>
             }
           </div>

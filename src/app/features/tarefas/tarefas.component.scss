@@ -41,8 +41,15 @@
   &--active { background: var(--accent); color: #fff; }
 }
 
-/* ── Novo grupo ── */
-.btn-novo-grupo {
+/* ── Ações do topo ── */
+.acoes-topo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.btn-acao {
   font-family: var(--sans);
   font-size: 13px;
   font-weight: 500;
@@ -52,23 +59,24 @@
   border-radius: 8px;
   padding: 9px 14px;
   cursor: pointer;
-  margin-bottom: 16px;
 
   &:hover { border-color: var(--accent); background: var(--accent-light); }
+  &--ghost { color: var(--muted); }
+  &--ghost:hover { color: var(--text); border-color: var(--border2); background: var(--bg); }
 }
 
-.novo-grupo {
+.nova-lista {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 16px;
+  width: 100%;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 14px;
 }
 
-.ng-input {
+.nl-input {
   flex: 1;
   min-width: 200px;
   font-family: var(--sans);
@@ -79,6 +87,11 @@
   outline: none;
 
   &:focus { border-color: var(--accent); }
+}
+
+.form-avulsa {
+  max-width: 460px;
+  margin-bottom: 16px;
 }
 
 .btn-confirm {
@@ -110,13 +123,18 @@
   &:hover { color: var(--text); }
 }
 
-/* ── Cards de grupo ── */
+/* ── Cards de lista ── */
 .coluna-card,
 .acordeao-card {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   padding: 16px;
+
+  &--avulsas {
+    border-style: dashed;
+    background: transparent;
+  }
 }
 
 /* ── Layout colunas (kanban) ── */
@@ -161,6 +179,7 @@
 
   &:hover { color: var(--text); background: var(--bg); }
   &--active { color: var(--accent); background: var(--accent-light); }
+  &--avulsas { font-style: italic; }
 }
 
 /* ── Layout acordeão ── */

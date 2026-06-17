@@ -1,5 +1,5 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
-import { Task, TaskGroup, TaskPriority } from './models';
+import { Task, TaskList, TaskPriority } from './models';
 import { SupabaseService } from './supabase.service';
 
 export interface TaskInput {
@@ -13,60 +13,63 @@ export interface TaskInput {
 export class TasksService {
   private readonly sb = inject(SupabaseService).client;
 
-  readonly grupos = signal<TaskGroup[]>([]);
+  readonly listas = signal<TaskList[]>([]);
   readonly tarefas = signal<Task[]>([]);
 
-  tarefasDoGrupo(grupoId: string) {
-    return computed(() => this.tarefas().filter(t => t.grupoId === grupoId));
+  /** Tarefas sem lista (avulsas, estilo ClickUp). */
+  readonly tarefasAvulsas = computed(() => this.tarefas().filter(t => t.listaId === null));
+
+  tarefasDaLista(listaId: string | null) {
+    return computed(() => this.tarefas().filter(t => t.listaId === listaId));
   }
 
   async loadAll(userId: string): Promise<void> {
-    const [gruposResult, tarefasResult] = await Promise.all([
-      this.sb.from('tarefa_grupos').select('*').eq('user_id', userId).order('created_at'),
+    const [listasResult, tarefasResult] = await Promise.all([
+      this.sb.from('tarefa_listas').select('*').eq('user_id', userId).order('created_at'),
       this.sb.from('tarefas').select('*').eq('user_id', userId).order('created_at'),
     ]);
 
-    this.grupos.set((gruposResult.data ?? []).map(this.mapGrupo));
+    this.listas.set((listasResult.data ?? []).map(this.mapLista));
     this.tarefas.set((tarefasResult.data ?? []).map(this.mapTarefa));
   }
 
-  // ---- Grupos ----
+  // ---- Listas ----
 
-  async addGrupo(userId: string, nome: string): Promise<void> {
+  async addLista(userId: string, nome: string): Promise<void> {
     const { data, error } = await this.sb
-      .from('tarefa_grupos')
+      .from('tarefa_listas')
       .insert({ user_id: userId, nome })
       .select().single();
     if (error) throw error;
-    this.grupos.update(list => [...list, this.mapGrupo(data)]);
+    this.listas.update(list => [...list, this.mapLista(data)]);
   }
 
-  async renameGrupo(userId: string, id: string, nome: string): Promise<void> {
+  async renameLista(userId: string, id: string, nome: string): Promise<void> {
     const { error } = await this.sb
-      .from('tarefa_grupos')
+      .from('tarefa_listas')
       .update({ nome })
       .eq('id', id).eq('user_id', userId);
     if (error) throw error;
-    this.grupos.update(list => list.map(g => g.id === id ? { ...g, nome } : g));
+    this.listas.update(list => list.map(l => l.id === id ? { ...l, nome } : l));
   }
 
-  async removeGrupo(userId: string, id: string): Promise<void> {
+  async removeLista(userId: string, id: string): Promise<void> {
     const { error } = await this.sb
-      .from('tarefa_grupos')
+      .from('tarefa_listas')
       .delete().eq('id', id).eq('user_id', userId);
     if (error) throw error;
-    this.grupos.update(list => list.filter(g => g.id !== id));
-    this.tarefas.update(list => list.filter(t => t.grupoId !== id));
+    this.listas.update(list => list.filter(l => l.id !== id));
+    this.tarefas.update(list => list.filter(t => t.listaId !== id));
   }
 
   // ---- Tarefas ----
 
-  async addTarefa(userId: string, grupoId: string, input: TaskInput): Promise<void> {
+  async addTarefa(userId: string, listaId: string | null, input: TaskInput): Promise<void> {
     const { data, error } = await this.sb
       .from('tarefas')
       .insert({
         user_id: userId,
-        grupo_id: grupoId,
+        lista_id: listaId,
         titulo: input.titulo,
         descricao: input.descricao,
         prazo: input.prazo,
@@ -113,13 +116,13 @@ export class TasksService {
 
   // ---- Mappers ----
 
-  private mapGrupo = (r: any): TaskGroup => ({
+  private mapLista = (r: any): TaskList => ({
     id: r.id, nome: r.nome, createdAt: r.created_at,
   });
 
   private mapTarefa = (r: any): Task => ({
     id: r.id,
-    grupoId: r.grupo_id,
+    listaId: r.lista_id,
     titulo: r.titulo,
     descricao: r.descricao,
     concluida: r.concluida,
