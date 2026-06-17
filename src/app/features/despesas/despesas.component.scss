@@ -56,8 +56,8 @@
 .saldo-fixo-valor {
   font-family: var(--mono);
   font-size: 22px;
-  font-weight: 500;
-  color: var(--accent);
+  font-weight: 600;
+  color: var(--pos);
 
   &.negativo { color: var(--red); }
 }
@@ -75,8 +75,8 @@
 
 /* ── Total balance ── */
 .saldo-total-bar {
-  background: var(--accent-light);
-  border: 1px solid var(--accent);
+  background: var(--pos-light);
+  border: 1px solid var(--pos);
   border-radius: var(--radius-lg);
   padding: 14px 20px;
   margin-top: 14px;
@@ -101,7 +101,7 @@
   align-items: center;
   gap: 10px;
   font-size: 12px;
-  color: var(--accent2);
+  color: var(--pos-strong);
   font-family: var(--mono);
   flex-wrap: wrap;
 
@@ -124,12 +124,12 @@
   font-weight: 600;
   letter-spacing: .07em;
   text-transform: uppercase;
-  color: var(--accent2);
+  color: var(--pos-strong);
 }
 
 .saldo-valor {
   font-family: var(--mono);
   font-size: 22px;
   font-weight: 500;
-  color: var(--accent2);
+  color: var(--pos-strong);
 }
